@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: culoco
+Version: 0.0.post1.dev0+dirty
+Author: Yandong Luo
+Platform: Linux
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Robotics
+Description-Content-Type: text/markdown
+Provides-Extra: ci
+Provides-Extra: smooth
+Provides-Extra: usd
+Provides-Extra: dev
+Provides-Extra: isaacsim
+Provides-Extra: doc

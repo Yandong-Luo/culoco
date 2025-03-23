@@ -1,0 +1,3 @@
+[submodule "submodule/curobo"]
+	path = submodule/curobo
+	url = https://github.com/NVlabs/curobo.git
