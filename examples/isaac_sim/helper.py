@@ -66,7 +66,7 @@ def add_robot_to_scene(
     load_from_usd: bool = False,
     subroot: str = "",
     robot_name: str = "robot",
-    position: np.array = np.array([0, 0, 0.45]),
+    position: np.array = np.array([0, 0, 0.42]),
 ):
 
     urdf_interface = _urdf.acquire_urdf_interface()

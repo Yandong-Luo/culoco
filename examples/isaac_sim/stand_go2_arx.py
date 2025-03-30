@@ -1,13 +1,99 @@
-#
-# Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-#
-# NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
-# property and proprietary rights in and to this material, related
-# documentation and any modifications thereto. Any use, reproduction,
-# disclosure or distribution of this material and related documentation
-# without an express license agreement from NVIDIA CORPORATION or
-# its affiliates is strictly prohibited.
-#
+def apply_pose_control(robot, articulation_controller, target_position="stand", transition_time=1.0):
+    """
+    Apply pose control to make the robot either stand or crouch.
+    
+    Args:
+        robot: The robot articulation object
+        articulation_controller: The articulation controller for the robot
+        target_position: "stand" or "crouch" to select the desired pose
+        transition_time: Time (in seconds) to transition to the target pose
+    
+    Returns:
+        is_done: True if transition is completed, False if still in progress
+    """
+    # Define robot positions (adjust these values for your specific robot)
+    stand_up_joint_pos = np.array([0.00571868, 0.608813, -1.21763, -0.00571868, 0.608813, -1.21763,
+                                   0.00571868, 0.608813, -1.21763, -0.00571868, 0.608813, -1.21763])
+    
+    stand_down_joint_pos = np.array([0.0473455, 1.22187, -2.44375, -0.0473455, 1.22187, -2.44375, 
+                                     0.0473455, 1.22187, -2.44375, -0.0473455, 1.22187, -2.44375])
+    
+    # Choose position based on argument
+    if target_position == "stand":
+        joint_positions = stand_up_joint_pos
+        kp_value = 50.0  # Higher stiffness for standing
+    else:  # crouch
+        joint_positions = stand_down_joint_pos
+        kp_value = 20.0  # Lower stiffness for crouching
+    
+    # Get joint indices
+    j_names = robot._articulation_view.get_joint_names()
+    idx_list = [robot.get_dof_index(x) for x in j_names]
+    
+    # Get current time from robot's world
+    curr_time = robot._world.current_time
+    
+    # Calculate transition phase
+    static_var = getattr(apply_pose_control, "static_vars", None)
+    if static_var is None:
+        # Initialize static variables for first call
+        apply_pose_control.static_vars = {
+            "start_time": curr_time,
+            "init_phase": True
+        }
+        static_var = apply_pose_control.static_vars
+    
+    elapsed_time = curr_time - static_var["start_time"]
+    if elapsed_time < transition_time:
+        transition_phase = np.tanh(elapsed_time / (transition_time * 0.8))
+        is_done = False
+    else:
+        transition_phase = 1.0
+        is_done = True
+    
+    # Get current joint positions
+    current_positions = robot.get_joint_positions()
+    
+    # Map target positions to actual robot joints
+    robot_joint_positions = np.zeros(len(idx_list))
+    
+    # If robot has exactly the same number of joints as our positions
+    if len(joint_positions) == len(idx_list):
+        robot_joint_positions = joint_positions
+    else:
+        # Map only the applicable joints (you might need to adjust this mapping)
+        joint_map = min(len(joint_positions), len(idx_list))
+        for i in range(joint_map):
+            robot_joint_positions[i] = joint_positions[i]
+    
+    # Create a smooth transition from current to target position
+    if static_var["init_phase"] and transition_phase < 1.0:
+        # Interpolate between current and target positions
+        position_command = (transition_phase * robot_joint_positions + 
+                           (1 - transition_phase) * current_positions)
+        
+        # Progressive stiffness increase
+        kp = transition_phase * kp_value + (1 - transition_phase) * 10.0
+    else:
+        position_command = robot_joint_positions
+        kp = kp_value
+        static_var["init_phase"] = False
+    
+    # Apply position control action
+    art_action = ArticulationAction(
+        position_command,
+        joint_indices=idx_list,
+    )
+    
+    articulation_controller.apply_action(art_action)
+    
+    # Set high joint stiffness to prevent collapse
+    robot._articulation_view.set_max_efforts(
+        values=np.array([5000 for _ in range(len(idx_list))]),
+        joint_indices=idx_list
+    )
+    
+    return is_done
 
 try:
     # Third Party
@@ -160,13 +246,13 @@ def main():
     # stage.SetDefaultPrim(stage.GetPrimAtPath("/World"))
 
     # Make a target to follow
-    # target = cuboid.VisualCuboid(
-    #     "/World/target",
-    #     position=np.array([0.5, 0, 0.5]),
-    #     orientation=np.array([0, 1, 0, 0]),
-    #     color=np.array([1.0, 0, 0]),
-    #     size=0.05,
-    # )
+    target = cuboid.VisualCuboid(
+        "/World/target",
+        position=np.array([0.5, 0, 0.5]),
+        orientation=np.array([0, 1, 0, 0]),
+        color=np.array([1.0, 0, 0]),
+        size=0.05,
+    )
 
     # setup_curobo_logger("warn")
     # past_pose = None
@@ -289,6 +375,10 @@ def main():
             robot._articulation_view.set_max_efforts(
                 values=np.array([5000 for i in range(len(idx_list))]), joint_indices=idx_list
             )
+        # if step_index >= 2:
+        #     # Choose "stand" or "crouch" according to your preference
+        #     apply_pose_control(robot, articulation_controller, target_position="stand")
+           
         # if step_index < 20:
         #     continue
 
@@ -310,10 +400,10 @@ def main():
         #     print("Updated World")
         #     carb.log_info("Synced CuRobo world from stage.")
 
-        # # position and orientation of target virtual cube:
-        # cube_position, cube_orientation = target.get_world_pose()
+        # position and orientation of target virtual cube:
+        target_position, target_orientation = target.get_world_pose()
 
-        # print("cube_position:", cube_position)
+        # print("target_position:", target_position)
 
         # if past_pose is None:
         #     past_pose = cube_position
