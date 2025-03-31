@@ -22,6 +22,8 @@ robot_cfg:
     urdf_path: "robot/go2_arx/urdf/go2_arx.urdf"
     # asset_root_path: "robot/franka_description"
     base_link: "base"
+    arm_ee_link: "arm_link6"
+    leg_ee_links: ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
     # ee_link: "panda_hand"
     # collision_link_names:
     #   [

@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Standard Library
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
@@ -9,24 +10,28 @@ from curobo.cuda_robot_model.types import (
     SelfCollisionKinematicsConfig,
 )
 from curobo.cuda_robot_model.cuda_robot_model import CudaRobotModelConfig, CudaRobotModel
+from curobo.cuda_robot_model.cuda_robot_generator import CudaRobotGeneratorConfig
 from culoco.cuda_loco_robot_model.cuda_loco_generator import CudaLocoGeneratorConfig, CudaLocoGenerator
 from curobo.types.base import TensorDeviceType
+from culoco.util_file import get_assets_path, get_robot_configs_path, join_path
 
 @dataclass
-class CudaLocoModelConfig(CudaRobotModelConfig):
+class CudaLocoModelConfig():
     """
     Extended robot model configuration for loco-manipulation systems
     
     Provides specific configuration parameters for quadruped robots with manipulator arms
     """
     #: Device and floating point precision to use for kinematics.
-    tensor_args: TensorDeviceType
+    # tensor_args: TensorDeviceType
     
-    # Separate collision detection configuration for the arm
-    arm_collision_config: Optional[SelfCollisionKinematicsConfig] = None
+    basic_model_config: CudaRobotModelConfig
     
-    # Separate collision detection configuration for the legs
-    leg_collision_config: Optional[SelfCollisionKinematicsConfig] = None
+    # # Separate collision detection configuration for the arm
+    # arm_collision_config: Optional[SelfCollisionKinematicsConfig] = None
+    
+    # # Separate collision detection configuration for the legs
+    # leg_collision_config: Optional[SelfCollisionKinematicsConfig] = None
     
     @staticmethod
     def from_basic_urdf(
@@ -36,51 +41,17 @@ class CudaLocoModelConfig(CudaRobotModelConfig):
         arm_ee_link: str,
         tensor_args: TensorDeviceType = TensorDeviceType(),
     ) -> CudaLocoModelConfig:
-        config = CudaLocoGeneratorConfig(base_link = base_link,
+        config = CudaLocoGeneratorConfig(
+                                         CudaRobotGeneratorConfig(base_link,
+                                                                  arm_ee_link,
+                                                                  tensor_args,
+                                                                  urdf_path=urdf_path,
+                                                                  asset_root_path=get_assets_path()),
                                          leg_ee_links = leg_ee_links,
-                                         ee_link = arm_ee_link,
-                                         tensor_args = tensor_args,
-                                         urdf_path=urdf_path
+                                         arm_ee_link = arm_ee_link, 
+                                         urdf_path = urdf_path,                                        
                                          )
         return CudaLocoModelConfig.from_config(config)
-    
-    # def __post_init__(self):
-    #     """Validate and set up configuration after initialization"""
-    #     # If arm_ee_link is not set, use parent class ee_link
-    #     if self.arm_ee_link is None:
-    #         self.arm_ee_link = self.kinematics_config.ee_link
-            
-    #     # If base_link_name is not set, use parent class base_link
-    #     if self.base_link_name is None:
-    #         self.base_link_name = self.kinematics_config.base_link
-            
-    #     # Validate configuration
-    #     self._validate_config()
-        
-    # def _validate_config(self):
-    #     """Validate configuration parameters"""
-    #     # Check leg joint indices
-    #     for idx in self.leg_joint_indices:
-    #         if idx < 0 or idx >= self.kinematics_config.n_dof:
-    #             raise ValueError(f"Leg joint index {idx} out of valid range [0, {self.kinematics_config.n_dof-1}]")
-        
-    #     # Check arm joint indices
-    #     for idx in self.arm_joint_indices:
-    #         if idx < 0 or idx >= self.kinematics_config.n_dof:
-    #             raise ValueError(f"Arm joint index {idx} out of valid range [0, {self.kinematics_config.n_dof-1}]")
-        
-    #     # Check leg end-effector links
-    #     for link in self.leg_ee_links:
-    #         if link not in self.link_names:
-    #             raise ValueError(f"Leg end-effector link {link} not in link name list")
-        
-    #     # Check arm end-effector link
-    #     if self.arm_ee_link not in self.link_names:
-    #         raise ValueError(f"Arm end-effector link {self.arm_ee_link} not in link name list")
-            
-    #     # Check base link
-    #     if self.base_link_name not in self.link_names:
-    #         raise ValueError(f"Base link {self.base_link_name} not in link name list")
     
     @staticmethod
     def from_config(config: CudaLocoGeneratorConfig) -> CudaLocoModelConfig:
@@ -94,16 +65,16 @@ class CudaLocoModelConfig(CudaRobotModelConfig):
         """
         # create a config generator and load all values
         generator = CudaLocoGenerator(config)
-        return CudaLocoModelConfig(
-            tensor_args=generator.tensor_args,
-            link_names=generator.link_names,
-            kinematics_config=generator.kinematics_config,
-            self_collision_config=generator.self_collision_config,
-            kinematics_parser=generator.kinematics_parser,
-            use_global_cumul=generator.use_global_cumul,
-            compute_jacobian=generator.compute_jacobian,
-            generator_config=config,
-        )
+        return CudaLocoModelConfig(CudaRobotModelConfig(
+                                    tensor_args=generator.robot_generator.tensor_args,
+                                    link_names=generator.robot_generator.link_names,
+                                    kinematics_config=generator.robot_generator.kinematics_config,
+                                    self_collision_config=generator.robot_generator.self_collision_config,
+                                    kinematics_parser=generator.robot_generator.kinematics_parser,
+                                    use_global_cumul=generator.robot_generator.use_global_cumul,
+                                    compute_jacobian=generator.robot_generator.compute_jacobian,
+                                    generator_config=config.base_config)
+                                   )
     
 #     @staticmethod
 #     def from_robot_config(
@@ -205,14 +176,14 @@ class CudaLocoModelConfig(CudaRobotModelConfig):
 #         )
 
 
-# class CudaLocoModel(CudaRobotModel):
-#     "CUDA Accelerated Loco-manipulation Model"
-#     def __init__(self, config: CudaRobotModelConfig):
-#         """Initialize kinematics instance with a robot model configuration.
+class CudaLocoModel(CudaLocoModelConfig):
+    "CUDA Accelerated Loco-manipulation Model"
+    def __init__(self, config: CudaLocoModelConfig):
+        """Initialize kinematics instance with a robot model configuration.
 
-#         Args:
-#             config: Input robot model configuration.
-#         """
-#         super().__init__(**vars(config))
-#         self._batch_size = 0
-#         self.update_batch_size(1, reset_buffers=True)
+        Args:
+            config: Input robot model configuration.
+        """
+        super().__init__(**vars(config))
+        # self._batch_size = 0
+        # self.update_batch_size(1, reset_buffers=True)

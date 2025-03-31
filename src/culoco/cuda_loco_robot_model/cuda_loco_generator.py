@@ -1,13 +1,19 @@
 # Standard Library
+import os
+import copy
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 
 from curobo.cuda_robot_model.urdf_kinematics_parser import UrdfKinematicsParser
 from curobo.cuda_robot_model.cuda_robot_generator import CudaRobotGeneratorConfig, CudaRobotGenerator
+from culoco.util_file import get_assets_path, get_robot_configs_path, join_path
+from curobo.util.logger import log_error, log_info, log_warn
 
 @dataclass
-class CudaLocoGeneratorConfig(CudaRobotGeneratorConfig):
-    # 
+class CudaLocoGeneratorConfig():
+    
+    base_config: CudaRobotGeneratorConfig
+    
     enable_manipulation: bool = True
     
     # Indices of leg joints in joint_names
@@ -19,32 +25,39 @@ class CudaLocoGeneratorConfig(CudaRobotGeneratorConfig):
     # Names of end-effector links for the four legs
     leg_ee_links: List[str] = field(default_factory=list)
     
-    # Names of all end-effector links for loco-manipulation
-    ee_links: List[str] = field(default_factory=list)
+    # # Names of all end-effector links for loco-manipulation
+    # ee_links: List[str] = field(default_factory=list)
     
-    # # Name of manipulator arm end-effector link, defaults to parent class ee_link
-    # arm_ee_link: Optional[str] = None
+    # Name of manipulator arm end-effector link, defaults to parent class ee_link
+    arm_ee_link: Optional[str] = None
     
     # # Base link representing the robot's trunk
     # base_link_name: Optional[str] = None
     
+    #: Path to load robot urdf.
+    urdf_path: Optional[str] = None
+    
+    asset_root_path: str = get_assets_path()
     # Height threshold for contact detection
     contact_threshold: float = 0.01
     
     def __post_init__(self):
-        super().__post_init__()
+        # super().__post_init__()
+        """Post initialization adds absolute paths, converts dictionaries to objects."""
+        self.base_config.__post_init__()
         
-class CudaLocoGenerator(CudaRobotGenerator):
-    def __init__(self, config: CudaLocoGeneratorConfig):
-        # 保存自定义字段
-        self.leg_joint_indices = config.leg_joint_indices
-        self.arm_joint_indices = config.arm_joint_indices
-        self.leg_ee_links = config.leg_ee_links
-        self.enable_manipulation = config.enable_manipulation
-        self.contact_threshold = config.contact_threshold
+        asset_path = get_assets_path()
+        # mannually update the urdf path
+        if self.urdf_path is not None:
+            self.base_config.urdf_path = join_path(asset_path, self.urdf_path)
 
-        # 调用父类构造函数（注意：不要用 super().__init__(config)，会构造错结构）
-        super().__init__(config)
+
+class CudaLocoGenerator(CudaLocoGeneratorConfig):
+    def __init__(self, config: CudaLocoGeneratorConfig):
+        super().__init__(**vars(config))
+        self.robot_generator = CudaRobotGenerator(config.base_config)
+        
+        # print(self.robot_generator.kinematics_config)
     
     def _build_chain(
         self,
