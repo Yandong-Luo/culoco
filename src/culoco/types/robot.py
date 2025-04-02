@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 # CuRobo
+from culoco.cuda_loco_robot_model.cuda_robot_generator import CudaRobotGeneratorConfig
+from culoco.cuda_loco_robot_model.cuda_robot_model import CudaRobotModelConfig
+
 from culoco.cuda_loco_robot_model.cuda_loco_generator import CudaLocoGeneratorConfig
 from culoco.cuda_loco_robot_model.cuda_loco_model import CudaLocoModelConfig
 from curobo.cuda_robot_model.types import CSpaceConfig
@@ -37,7 +40,7 @@ class RobotConfig:
     """
 
     #: Robot kinematics configuration to load into cuda robot model.
-    kinematics: CudaLocoModelConfig
+    kinematics: CudaRobotModelConfig
 
     tensor_args: TensorDeviceType = TensorDeviceType()
 
@@ -47,16 +50,17 @@ class RobotConfig:
             data_dict_in = data_dict_in["robot_cfg"]
         data_dict = deepcopy(data_dict_in)
         if isinstance(data_dict["kinematics"], dict):
-            data_dict["kinematics"] = CudaLocoModelConfig.from_config(
-                CudaLocoGeneratorConfig(**data_dict_in["kinematics"], tensor_args=tensor_args)
+            data_dict["kinematics"] = CudaRobotModelConfig.from_config(
+                CudaRobotGeneratorConfig(**data_dict_in["kinematics"], tensor_args=tensor_args)
             )
 
         return RobotConfig(**data_dict, tensor_args=tensor_args)
 
     @staticmethod
-    def from_basic(urdf_path, base_link, leg_ee_links, arm_ee_link, tensor_args=TensorDeviceType()):
-        cuda_robot_model_config = CudaLocoModelConfig.from_basic_urdf(
-            urdf_path, base_link, leg_ee_links, arm_ee_link, tensor_args
+    def from_basic(urdf_path, base_link, ee_links, tensor_args=TensorDeviceType()):
+        print("from_basic ee_links", ee_links)
+        cuda_robot_model_config = CudaRobotModelConfig.from_basic_urdf(
+            urdf_path, base_link, ee_links, tensor_args
         )
 
         return RobotConfig(

@@ -24,6 +24,7 @@ robot_cfg:
     base_link: "base"
     arm_ee_link: "arm_link6"
     leg_ee_links: ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
+    ee_links: ["arm_link6","FL_foot", "FR_foot", "RL_foot", "RR_foot"]
     # ee_link: "panda_hand"
     # collision_link_names:
     #   [

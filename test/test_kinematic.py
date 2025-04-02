@@ -15,7 +15,7 @@
 import torch
 
 # CuRobo
-from culoco.cuda_loco_robot_model.cuda_loco_model import CudaLocoModel
+from culoco.cuda_loco_robot_model.cuda_robot_model import CudaRobotModel
 from curobo.types.base import TensorDeviceType
 from culoco.types.robot import RobotConfig
 from curobo.util.logger import setup_curobo_logger
@@ -34,34 +34,36 @@ def demo_basic_robot():
     base_link = config_file["robot_cfg"]["kinematics"]["base_link"]
     arm_ee_link = config_file["robot_cfg"]["kinematics"]["arm_ee_link"]
     leg_ee_links = config_file["robot_cfg"]["kinematics"]["leg_ee_links"]
-    robot_cfg = RobotConfig.from_basic(urdf_file, base_link, leg_ee_links, arm_ee_link, tensor_args)
+    ee_links = config_file["robot_cfg"]["kinematics"]["ee_links"]
+    robot_cfg = RobotConfig.from_basic(urdf_file, base_link, ee_links, tensor_args)
 
-    kin_model = CudaLocoModel(robot_cfg.kinematics)
+    print(robot_cfg)
+#     kin_model = CudaLocoModel(robot_cfg.kinematics)
 
-    # compute forward kinematics:
+#     # compute forward kinematics:
 
-    q = torch.rand((10, kin_model.get_dof()), **(tensor_args.as_torch_dict()))
-    out = kin_model.get_state(q)
-    # here is the kinematics state:
-    # print(out)
+#     print(kin_model.basic_model_config.get_dof())
+#     q = torch.rand((10, kin_model.basic_model_config.get_dof()), **(tensor_args.as_torch_dict()))
+#     out = kin_model.get_state(q)
+#     # here is the kinematics state:
+#     # print(out)
 
+# def demo_full_config_robot():
+#     setup_curobo_logger("info")
+#     tensor_args = TensorDeviceType()
+#     # load a urdf:
+#     config_file = load_yaml(join_path(get_robot_path(), "franka.yml"))["robot_cfg"]
+#     robot_cfg = RobotConfig.from_dict(config_file, tensor_args)
 
-def demo_full_config_robot():
-    setup_curobo_logger("info")
-    tensor_args = TensorDeviceType()
-    # load a urdf:
-    config_file = load_yaml(join_path(get_robot_path(), "franka.yml"))["robot_cfg"]
-    robot_cfg = RobotConfig.from_dict(config_file, tensor_args)
+#     kin_model = CudaLocoModel(robot_cfg.kinematics)
 
-    kin_model = CudaLocoModel(robot_cfg.kinematics)
-
-    # compute forward kinematics:
-    q = torch.rand((10, kin_model.get_dof()), **(tensor_args.as_torch_dict()))
-    out = kin_model.get_state(q)
-    # here is the kinematics state:
-    # print(out)
+#     # compute forward kinematics:
+#     q = torch.rand((10, kin_model.get_dof()), **(tensor_args.as_torch_dict()))
+#     out = kin_model.get_state(q)
+#     # here is the kinematics state:
+#     # print(out)
 
 
 if __name__ == "__main__":
     demo_basic_robot()
-    demo_full_config_robot()
+    # demo_full_config_robot()
