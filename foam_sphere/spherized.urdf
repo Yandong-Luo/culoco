@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="b1_description" path="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/urdf/z1.urdf">
+	<material name="black">
+		<color rgba="0.0 0.0 0.0 1.0"></color>
+	</material>
+	<material name="blue">
+		<color rgba="0.0 0.0 0.8 1.0"></color>
+	</material>
+	<material name="green">
+		<color rgba="0.0 0.8 0.0 1.0"></color>
+	</material>
+	<material name="grey">
+		<color rgba="0.2 0.2 0.2 1.0"></color>
+	</material>
+	<material name="silver">
+		<color rgba="0.9137254901960784 0.9137254901960784 0.8470588235294118 1.0"></color>
+	</material>
+	<material name="orange">
+		<color rgba="1.0 0.4235294117647059 0.0392156862745098 1.0"></color>
+	</material>
+	<material name="brown">
+		<color rgba="0.8705882352941177 0.8117647058823529 0.7647058823529411 1.0"></color>
+	</material>
+	<material name="red">
+		<color rgba="0.8 0.0 0.0 1.0"></color>
+	</material>
+	<material name="white">
+		<color rgba="1.0 1.0 1.0 1.0"></color>
+	</material>
+	<gazebo reference="imu_link">
+		<gravity>true</gravity>
+		<sensor name="imu_sensor" type="imu">
+			<always_on>true</always_on>
+			<update_rate>1000</update_rate>
+			<visualize>true</visualize>
+			<topic>__default_topic__</topic>
+			<plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+				<topicName>trunk_imu</topicName>
+				<bodyName>imu_link</bodyName>
+				<updateRateHZ>1000.0</updateRateHZ>
+				<gaussianNoise>0.0</gaussianNoise>
+				<xyzOffset>0 0 0</xyzOffset>
+				<rpyOffset>0 0 0</rpyOffset>
+				<frameName>imu_link</frameName>
+			</plugin>
+			<pose>0 0 0 0 0 0</pose>
+		</sensor>
+	</gazebo>
+	<gazebo reference="FR_calf">
+		<sensor name="FR_foot_contact" type="contact">
+			<update_rate>100</update_rate>
+			<plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"></plugin>
+			<contact>
+				<collision>FR_calf_fixed_joint_lump__FR_foot_collision_1</collision>
+			</contact>
+		</sensor>
+	</gazebo>
+	<gazebo reference="FL_calf">
+		<sensor name="FL_foot_contact" type="contact">
+			<update_rate>100</update_rate>
+			<plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"></plugin>
+			<contact>
+				<collision>FL_calf_fixed_joint_lump__FL_foot_collision_1</collision>
+			</contact>
+		</sensor>
+	</gazebo>
+	<gazebo reference="RR_calf">
+		<sensor name="RR_foot_contact" type="contact">
+			<update_rate>100</update_rate>
+			<plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"></plugin>
+			<contact>
+				<collision>RR_calf_fixed_joint_lump__RR_foot_collision_1</collision>
+			</contact>
+		</sensor>
+	</gazebo>
+	<gazebo reference="RL_calf">
+		<sensor name="RL_foot_contact" type="contact">
+			<update_rate>100</update_rate>
+			<plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"></plugin>
+			<contact>
+				<collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
+			</contact>
+		</sensor>
+	</gazebo>
+	<gazebo reference="FR_foot">
+		<visual>
+			<plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
+				<topicName>FR_foot_contact</topicName>
+			</plugin>
+		</visual>
+	</gazebo>
+	<gazebo reference="FL_foot">
+		<visual>
+			<plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
+				<topicName>FL_foot_contact</topicName>
+			</plugin>
+		</visual>
+	</gazebo>
+	<gazebo reference="RR_foot">
+		<visual>
+			<plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
+				<topicName>RR_foot_contact</topicName>
+			</plugin>
+		</visual>
+	</gazebo>
+	<gazebo reference="RL_foot">
+		<visual>
+			<plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
+				<topicName>RL_foot_contact</topicName>
+			</plugin>
+		</visual>
+	</gazebo>
+	<gazebo reference="base">
+		<material>Gazebo/Green</material>
+		<turnGravityOff>false</turnGravityOff>
+	</gazebo>
+	<gazebo reference="trunk">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="stick_link">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/White</material>
+	</gazebo>
+	<gazebo reference="imu_link">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/Red</material>
+	</gazebo>
+	<gazebo reference="FL_hip">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/DarkGrey</material>
+	</gazebo>
+	<gazebo reference="FL_thigh">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="FL_calf">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+	</gazebo>
+	<gazebo reference="FL_foot">
+		<mu1>0.6</mu1>
+		<mu2>0.6</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="FR_hip">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/DarkGrey</material>
+	</gazebo>
+	<gazebo reference="FR_thigh">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="FR_calf">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+	</gazebo>
+	<gazebo reference="FR_foot">
+		<mu1>0.6</mu1>
+		<mu2>0.6</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="RL_hip">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/DarkGrey</material>
+	</gazebo>
+	<gazebo reference="RL_thigh">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="RL_calf">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+	</gazebo>
+	<gazebo reference="RL_foot">
+		<mu1>0.6</mu1>
+		<mu2>0.6</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="RR_hip">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<material>Gazebo/DarkGrey</material>
+	</gazebo>
+	<gazebo reference="RR_thigh">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<gazebo reference="RR_calf">
+		<mu1>0.2</mu1>
+		<mu2>0.2</mu2>
+		<self_collide>1</self_collide>
+	</gazebo>
+	<gazebo reference="RR_foot">
+		<mu1>0.6</mu1>
+		<mu2>0.6</mu2>
+		<self_collide>1</self_collide>
+		<material>Gazebo/DarkGrey</material>
+		<kp value="1000000.0"></kp>
+		<kd value="1.0"></kd>
+	</gazebo>
+	<joint name="trunk_arm_joint0" type="fixed" dont_collapse="true">
+		<origin rpy="0 0 0" xyz="0.2535 0 0.056"></origin>
+		<parent link="trunk"></parent>
+		<child link="arm_link00"></child>
+	</joint>
+	<joint name="arm_joint1" type="revolute">
+		<origin rpy="0 0 0" xyz="0 0 0.0585"></origin>
+		<parent link="arm_link00"></parent>
+		<child link="arm_link01"></child>
+		<axis xyz="0 0 1"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-2.6179938779914944" upper="2.6179938779914944" velocity="3.1415"></limit>
+	</joint>
+	<joint name="arm_joint2" type="revolute">
+		<origin rpy="0 0 0" xyz="0 0 0.045"></origin>
+		<parent link="arm_link01"></parent>
+		<child link="arm_link02"></child>
+		<axis xyz="0 1 0"></axis>
+		<dynamics damping="2.0" friction="2.0"></dynamics>
+		<limit effort="60.0" lower="0.0" upper="2.9670597283903604" velocity="3.1415"></limit>
+	</joint>
+	<joint name="arm_joint3" type="revolute">
+		<origin rpy="0 0 0" xyz="-0.35 0 0"></origin>
+		<parent link="arm_link02"></parent>
+		<child link="arm_link03"></child>
+		<axis xyz="0 1 0"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-2.8797932657906435" upper="0.0" velocity="3.1415"></limit>
+	</joint>
+	<joint name="arm_joint4" type="revolute">
+		<origin rpy="0 0 0" xyz="0.218 0 0.057"></origin>
+		<parent link="arm_link03"></parent>
+		<child link="arm_link04"></child>
+		<axis xyz="0 1 0"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-1.5184364492350666" upper="1.5184364492350666" velocity="3.1415"></limit>
+	</joint>
+	<joint name="arm_joint5" type="revolute">
+		<origin rpy="0 0 0" xyz="0.07 0.0 0.0"></origin>
+		<parent link="arm_link04"></parent>
+		<child link="arm_link05"></child>
+		<axis xyz="0 0 1"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-1.3439035240356338" upper="1.3439035240356338" velocity="3.1415"></limit>
+	</joint>
+	<joint name="arm_joint6" type="revolute">
+		<origin rpy="0 0 0" xyz="0.0492 0.0 0.0"></origin>
+		<parent link="arm_link05"></parent>
+		<child link="arm_link06"></child>
+		<axis xyz="1 0 0"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-2.792526803190927" upper="2.792526803190927" velocity="3.1415"></limit>
+	</joint>
+	<joint name="gripperStator" type="fixed">
+		<origin rpy="0 0 0" xyz="0.051 0.0 0.0"></origin>
+		<parent link="arm_link06"></parent>
+		<child link="gripperStator"></child>
+	</joint>
+	<joint name="jointGripper" type="revolute">
+		<origin rpy="0 0 0" xyz="0.049 0.0 0"></origin>
+		<parent link="gripperStator"></parent>
+		<child link="gripperMover"></child>
+		<axis xyz="0 1 0"></axis>
+		<dynamics damping="1.0" friction="1.0"></dynamics>
+		<limit effort="30.0" lower="-1.5707963267948966" upper="0.0" velocity="3.1415"></limit>
+	</joint>
+	<joint name="floating_base" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0"></origin>
+		<parent link="base"></parent>
+		<child link="trunk"></child>
+	</joint>
+	<link name="arm_link00">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link00.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.04131"></sphere>
+			</geometry>
+			<origin xyz="0.0 0.0 0.0255" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="-0.00334984 -0.00013615 0.02495843"></origin>
+			<mass value="0.47247481"></mass>
+			<inertia ixx="0.00037937" ixy="-3.5e-07" ixz="-1.037e-05" iyy="0.00041521" iyz="-9.9e-07" izz="0.00053066"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link01">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link01.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.060478"></sphere>
+			</geometry>
+			<origin xyz="1e-06 -1e-06 3e-06" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="2.47e-06 -0.00025198 0.02317169"></origin>
+			<mass value="0.67332551"></mass>
+			<inertia ixx="0.00128328" ixy="-6e-08" ixz="-4e-07" iyy="0.00071931" iyz="5e-07" izz="0.00083936"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link02">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link02.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.060478"></sphere>
+			</geometry>
+			<origin xyz="2e-06 -1e-06 0.0" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031787"></sphere>
+			</geometry>
+			<origin xyz="-0.06745199999999998 -1e-06 0.0" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031331"></sphere>
+			</geometry>
+			<origin xyz="-0.11111499999999998 0.0 -1e-06" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031444"></sphere>
+			</geometry>
+			<origin xyz="-0.15521899999999997 2e-06 -3e-06" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031697"></sphere>
+			</geometry>
+			<origin xyz="-0.19951299999999997 0.0 1e-06" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.027523"></sphere>
+			</geometry>
+			<origin xyz="-0.237695 0.0 1.3e-05" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031748"></sphere>
+			</geometry>
+			<origin xyz="-0.257583 6e-06 6.7e-05" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.027285"></sphere>
+			</geometry>
+			<origin xyz="-0.261275 -0.003331 -0.001656" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.026085"></sphere>
+			</geometry>
+			<origin xyz="-0.262696 0.003441 -0.004188" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.041312"></sphere>
+			</geometry>
+			<origin xyz="-0.350002 0.0 1e-06" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="-0.11012601 0.00240029 0.00158266"></origin>
+			<mass value="1.19132258"></mass>
+			<inertia ixx="0.00102138" ixy="0.00062358" ixz="5.13e-06" iyy="0.02429457" iyz="-2.1e-06" izz="0.02466114"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link03">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link03.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.028255"></sphere>
+			</geometry>
+			<origin xyz="0.08995800000000001 -1e-06 0.055" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.028254"></sphere>
+			</geometry>
+			<origin xyz="0.166044 -1e-06 0.055" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.02531"></sphere>
+			</geometry>
+			<origin xyz="0.14315 0.0 0.055" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.025504"></sphere>
+			</geometry>
+			<origin xyz="0.110683 0.0 0.055" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.043892"></sphere>
+			</geometry>
+			<origin xyz="0.2205 0.0 0.055" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.10609208 -0.00541815 0.03476383"></origin>
+			<mass value="0.83940874"></mass>
+			<inertia ixx="0.00108061" ixy="-8.669e-05" ixz="-0.00208102" iyy="0.00954238" iyz="-1.332e-05" izz="0.00886621"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link04">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link04.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.046674"></sphere>
+			</geometry>
+			<origin xyz="0.072 0.0 0.0" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.04366681 0.00364738 -0.00170192"></origin>
+			<mass value="0.56404563"></mass>
+			<inertia ixx="0.00031576" ixy="8.13e-05" ixz="4.091e-05" iyy="0.00092996" iyz="-5.96e-06" izz="0.00097912"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link05">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link05.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.03121533 0.0 0.00646316"></origin>
+			<mass value="0.38938492"></mass>
+			<inertia ixx="0.00017605" ixy="4e-07" ixz="5.689e-05" iyy="0.00055896" iyz="-1.3e-07" izz="0.0005386"></inertia>
+		</inertial>
+	</link>
+	<link name="arm_link06">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_Link06.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.041311"></sphere>
+			</geometry>
+			<origin xyz="0.025498999999999997 1e-06 0.0" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.0241569 -0.00017355 -0.00143876"></origin>
+			<mass value="0.28875807"></mass>
+			<inertia ixx="0.00018328" ixy="1.22e-06" ixz="5.4e-07" iyy="0.0001475" iyz="8e-08" izz="0.0001468"></inertia>
+		</inertial>
+	</link>
+	<link name="gripperStator">
+		<visual>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_GripperStator.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.056715"></sphere>
+			</geometry>
+			<origin xyz="0.038118372240885635 0.0009816293523981176 0.00018430395172673412" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.040101"></sphere>
+			</geometry>
+			<origin xyz="0.07820037224088563 0.020740629352398118 -0.019082696048273267" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.039912"></sphere>
+			</geometry>
+			<origin xyz="0.07660737224088564 -0.02239737064760188 -0.019081696048273266" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.035042"></sphere>
+			</geometry>
+			<origin xyz="0.12619237224088564 -0.01966337064760188 -0.021274696048273267" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.03501"></sphere>
+			</geometry>
+			<origin xyz="0.12745837224088563 0.017132629352398118 -0.021041696048273266" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.04764427 -0.00035819 -0.00249162"></origin>
+			<mass value="0.52603655"></mass>
+			<inertia ixx="0.00038683" ixy="-3.59e-06" ixz="7.662e-05" iyy="0.00068614" iyz="2.09e-06" izz="0.00066293"></inertia>
+		</inertial>
+	</link>
+	<link name="gripperMover">
+		<visual>
+			<geometry>
+				<mesh filename="/home/chris/Desktop/awesome-loco-manipulation/robots/B1_Z1/meshes/z1_GripperMover.dae" scale="1 1 1"></mesh>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="0.028601"></sphere>
+			</geometry>
+			<origin xyz="0.0013451956993122752 0.03513618772499222 0.004130578851448419" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.032393"></sphere>
+			</geometry>
+			<origin xyz="0.04020319569931228 0.024170187724992215 0.013287578851448418" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.034005"></sphere>
+			</geometry>
+			<origin xyz="0.07491019569931227 0.013441187724992214 0.004091578851448419" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.033737"></sphere>
+			</geometry>
+			<origin xyz="0.07304119569931228 -0.015425812275007786 0.004931578851448419" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.031067"></sphere>
+			</geometry>
+			<origin xyz="0.03748919569931228 -0.028555812275007787 0.01264857885144842" rpy="0 0 0"></origin>
+		</collision>
+		<collision>
+			<geometry>
+				<sphere radius="0.027721"></sphere>
+			</geometry>
+			<origin xyz="0.00036919569931227747 -0.03580681227500779 0.0037405788514484188" rpy="0 0 0"></origin>
+		</collision>
+		<inertial>
+			<origin rpy="0 0 0" xyz="0.01320633 0.00476708 0.00380534"></origin>
+			<mass value="0.27621302"></mass>
+			<inertia ixx="0.00017716" ixy="1.683e-05" ixz="-1.786e-05" iyy="0.00026787" iyz="2.62e-06" izz="0.00035728"></inertia>
+		</inertial>
+	</link>
+	<link name="base">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"></origin>
+			<geometry>
+				<box size="0.001 0.001 0.001"></box>
+			</geometry>
+		</visual>
+	</link>
+	<transmission name="JointTransGripper">
+		<type>transmission_interface/SimpleTransmission</type>
+		<joint name="jointGripper">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		</joint>
+		<actuator name="ActuatorGripper">
+			<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+</robot>
