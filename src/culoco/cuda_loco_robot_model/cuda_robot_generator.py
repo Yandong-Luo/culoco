@@ -392,8 +392,11 @@ class CudaRobotGenerator(CudaRobotGeneratorConfig):
             if self.lock_joints is None:
                 self._build_multi_chain_kinematics(self.base_link, self.ee_links, other_links, self.link_names)
             else:
-                self._build_kinematics_with_lock_joints(
-                    self.base_link, self.ee_link, other_links, self.link_names, self.lock_joints
+                # self._build_kinematics_with_lock_joints(
+                #     self.base_link, self.ee_link, other_links, self.link_names, self.lock_joints
+                # )
+                self._build_multi_kinematics_with_lock_joints(
+                    self.base_link, self.ee_links, other_links, self.link_names, self.lock_joints
                 )
             if self.cspace is None:
                 jpv = self._get_joint_position_velocity_limits()
@@ -796,6 +799,139 @@ class CudaRobotGenerator(CudaRobotGeneratorConfig):
             lock_joints: Joints to lock in the kinematic tree with value to lock at.
         """
         chain_link_names = self._build_chain(base_link, ee_link, other_links)
+        # find links attached to lock joints:
+        lock_joint_names = list(lock_joints.keys())
+
+        joint_data = self._get_joint_links(lock_joint_names)
+
+        lock_links = list(
+            [joint_data[j]["parent"] for j in joint_data.keys()]
+            + [joint_data[j]["child"] for j in joint_data.keys()]
+        )
+
+        for k in lock_joint_names:
+            if "mimic" in joint_data[k]:
+                mimic_link_names = [[x["parent"], x["child"]] for x in joint_data[k]["mimic"]]
+                mimic_link_names = [x for xs in mimic_link_names for x in xs]
+                lock_links += mimic_link_names
+        lock_links = list(set(lock_links))
+
+        new_link_names = list(set(link_names + lock_links))
+
+        # rebuild kinematic tree with link names added to link pose computation:
+        self._build_kinematics_tensors(base_link, new_link_names, chain_link_names)
+        if self.collision_spheres is not None and len(self.collision_link_names) > 0:
+            self._build_collision_model(
+                self.collision_spheres, self.collision_link_names, self.collision_sphere_buffer
+            )
+        # do forward kinematics and get transform for locked joints:
+        q = torch.zeros(
+            (1, self._n_dofs), device=self.tensor_args.device, dtype=self.tensor_args.dtype
+        )
+        # set lock joints in the joint angles:
+        l_idx = torch.as_tensor(
+            [self.joint_names.index(l) for l in lock_joints.keys()],
+            dtype=torch.long,
+            device=self.tensor_args.device,
+        )
+        l_val = self.tensor_args.to_device([lock_joints[l] for l in lock_joints.keys()])
+
+        q[0, l_idx] = l_val
+        kinematics_config = KinematicsTensorConfig(
+            fixed_transforms=self._fixed_transform,
+            link_map=self._link_map,
+            joint_map=self._joint_map,
+            joint_map_type=self._joint_map_type,
+            joint_offset_map=self._joint_offset_map,
+            store_link_map=self._store_link_map,
+            link_chain_map=self._link_chain_map,
+            link_names=self.link_names,
+            link_spheres=self._link_spheres_tensor,
+            link_sphere_idx_map=self._link_sphere_idx_map,
+            n_dof=self._n_dofs,
+            joint_limits=self._joint_limits,
+            non_fixed_joint_names=self.non_fixed_joint_names,
+            total_spheres=self.total_spheres,
+        )
+        link_poses = self._get_link_poses(q, lock_links, kinematics_config)
+        # remove lock links from store map:
+        store_link_map = [chain_link_names.index(l) for l in link_names]
+        self._store_link_map = torch.as_tensor(
+            store_link_map, device=self.tensor_args.device, dtype=torch.int16
+        )
+        self.link_names = link_names
+        # compute a fixed transform for fixing joints:
+        with profiler.record_function("cuda_robot_generator/fix_locked_joints"):
+            # convert tensors to cpu:
+            self._joint_map_type = self._joint_map_type.to(device=self.cpu_tensor_args.device)
+            self._joint_map = self._joint_map.to(device=self.cpu_tensor_args.device)
+
+            for j in lock_joint_names:
+                w_parent = lock_links.index(joint_data[j]["parent"])
+                w_child = lock_links.index(joint_data[j]["child"])
+                parent_t_child = (
+                    link_poses.get_index(0, w_parent)
+                    .inverse()
+                    .multiply(link_poses.get_index(0, w_child))
+                )
+                # Make this joint as fixed
+                i = joint_data[j]["link_index"]
+                self._fixed_transform[i] = parent_t_child.get_matrix()
+
+                if "mimic" in joint_data[j]:
+                    for mimic_joint in joint_data[j]["mimic"]:
+                        w_parent = lock_links.index(mimic_joint["parent"])
+                        w_child = lock_links.index(mimic_joint["child"])
+                        parent_t_child = (
+                            link_poses.get_index(0, w_parent)
+                            .inverse()
+                            .multiply(link_poses.get_index(0, w_child))
+                        )
+                        i_q = mimic_joint["link_index"]
+                        self._fixed_transform[i_q] = parent_t_child.get_matrix()
+                        self._controlled_links.remove(i_q)
+                        self._joint_map_type[i_q] = -1
+                        self._joint_map[i_q] = -1
+
+                i = joint_data[j]["link_index"]
+                self._joint_map_type[i] = -1
+                self._joint_map[i:] -= 1
+                self._joint_map[i] = -1
+                self._controlled_links.remove(i)
+                self.joint_names.remove(j)
+                self._n_dofs -= 1
+                self._active_joints.remove(i)
+            self._joint_map[self._joint_map < -1] = -1
+            self._joint_map = self._joint_map.to(device=self.tensor_args.device)
+            self._joint_map_type = self._joint_map_type.to(device=self.tensor_args.device)
+        if len(self.lock_joints.keys()) > 0:
+            self.lock_jointstate = JointState(
+                position=l_val, joint_names=list(self.lock_joints.keys())
+            )
+            
+    @profiler.record_function("robot_generator/build_kinematics_with_lock_joints")
+    def _build_multi_kinematics_with_lock_joints(
+        self,
+        base_link: str,
+        ee_links: List[str],
+        other_links: List[str],
+        link_names: List[str],
+        lock_joints: Dict[str, float],
+    ):
+        """Build kinematics with locked joints.
+
+        This function will first build the chain with no locked joints, find the transforms
+        when the locked joints are set to the given values, and then use these transforms as
+        fixed transforms for the locked joints.
+
+        Args:
+            base_link: Base link of the kinematic tree.
+            ee_link: End-effector link of the kinematic tree.
+            other_links: Other links to add to the kinematic tree.
+            link_names: List of link names to store poses after kinematics computation.
+            lock_joints: Joints to lock in the kinematic tree with value to lock at.
+        """
+        chain_link_names = self._build_multi_chain(base_link, ee_links, other_links)
         # find links attached to lock joints:
         lock_joint_names = list(lock_joints.keys())
 

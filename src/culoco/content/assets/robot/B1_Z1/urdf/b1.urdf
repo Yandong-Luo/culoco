@@ -33,7 +33,7 @@
   </material>
   <!-- ros_control plugin -->
 
-  <gazebo reference="imu_link">
+  <!-- <gazebo reference="imu_link">
     <gravity>true</gravity>
     <sensor name="imu_sensor" type="imu">
       <always_on>true</always_on>
@@ -51,9 +51,9 @@
       </plugin>
       <pose>0 0 0 0 0 0</pose>
     </sensor>
-  </gazebo>
+  </gazebo> -->
   <!-- Foot contacts. -->
-  <gazebo reference="FR_calf">
+  <!-- <gazebo reference="FR_calf">
     <sensor name="FR_foot_contact" type="contact">
       <update_rate>100</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
@@ -88,9 +88,9 @@
         <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
       </contact>
     </sensor>
-  </gazebo>
+  </gazebo> -->
   <!-- Visualization of Foot contacts. -->
-  <gazebo reference="FR_foot">
+  <!-- <gazebo reference="FR_foot">
     <visual>
       <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
         <topicName>FR_foot_contact</topicName>
@@ -138,8 +138,8 @@
     <mu2>0.2</mu2>
     <material>Gazebo/Red</material>
   </gazebo>
-  <!-- FL leg -->
-  <gazebo reference="FL_hip">
+  FL leg -->
+  <!-- <gazebo reference="FL_hip">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <material>Gazebo/DarkGrey</material>
@@ -164,9 +164,9 @@
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
-  </gazebo>
+  </gazebo> -->
   <!-- FR leg -->
-  <gazebo reference="FR_hip">
+  <!-- <gazebo reference="FR_hip">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <material>Gazebo/DarkGrey</material>
@@ -191,9 +191,9 @@
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
-  </gazebo>
+  </gazebo> -->
   <!-- RL leg -->
-  <gazebo reference="RL_hip">
+  <!-- <gazebo reference="RL_hip">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <material>Gazebo/DarkGrey</material>
@@ -218,9 +218,9 @@
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
-  </gazebo>
+  </gazebo> -->
   <!-- RR leg -->
-  <gazebo reference="RR_hip">
+  <!-- <gazebo reference="RR_hip">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     <material>Gazebo/DarkGrey</material>
@@ -245,7 +245,7 @@
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
-  </gazebo>
+  </gazebo> -->
   <!-- Rotor related joint and link is only for demonstrate location. -->
   <!-- Actually, the rotor will rotate and the joint is not fixed. Reduction ratio should be considered. -->
   <!-- Debug mode will hung up the robot, use "true" or "false" to switch it. -->
@@ -515,6 +515,15 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+
+  <link name="arm_ee_link"/>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.085 0 -0.017"/>  <!-- modify this value so that xyz is located at the center-->
+    <parent link="gripperMover"/>
+    <child link="arm_ee_link"/>
+  </joint>
+
   <link name="base">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
