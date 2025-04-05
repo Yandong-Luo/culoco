@@ -63,6 +63,7 @@ def add_extensions(simulation_app, headless_mode: Optional[str] = None):
 def add_robot_to_scene(
     robot_config: Dict,
     my_world: World,
+    default_config: List,
     load_from_usd: bool = False,
     subroot: str = "",
     robot_name: str = "robot",

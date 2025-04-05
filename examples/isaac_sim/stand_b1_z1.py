@@ -216,12 +216,15 @@ from culoco.util_file import (
 )
 
 # from culoco.util_file import get_robot_path, join_path, load_yaml, get_assets_path
-from culoco.cuda_loco_robot_model.cuda_robot_model import CudaRobotModel
+from culoco.cuda_loco_robot_model.cuda_robot_model import CudaLocoRobotModel
+from curobo.cuda_robot_model.cuda_robot_model import CudaRobotModel
 from culoco.types.robot import RobotConfig
 
 from curobo.util_file import (
     get_world_configs_path,
 )
+
+from scipy.spatial.transform import Rotation as R
 
 # from curobo.wrap.reacher.motion_gen import (
 #     MotionGen,
@@ -281,8 +284,8 @@ def main():
         robot_cfg["kinematics"]["external_robot_configs_path"] = args.external_robot_configs_path
     j_names = robot_cfg["kinematics"]["cspace"]["joint_names"]
     default_config = robot_cfg["kinematics"]["cspace"]["retract_config"]
-
-    robot, robot_prim_path = add_robot_to_scene(robot_cfg, my_world)
+    print(type(default_config))
+    robot, robot_prim_path = add_robot_to_scene(robot_cfg, my_world, default_config)
 
     articulation_controller = None
 
@@ -339,7 +342,13 @@ def main():
     config_file = load_yaml(join_path(get_robot_path(), "b1_z1.yml"))["robot_cfg"]
     robot_cfg = RobotConfig.from_dict(config_file, tensor_args)
 
-    kin_model = CudaRobotModel(robot_cfg.kinematics)
+    kin_model = None
+    if robot_cfg.kinematics.generator_config.enable_multi_chain == False:
+        kin_model = CudaRobotModel(robot_cfg.kinematics)
+    else:
+        kin_model = CudaLocoRobotModel(robot_cfg.kinematics)
+        
+    # kin_model = CudaRobotModel(robot_cfg.kinematics)
 
     # plan_config = MotionGenPlanConfig(
     #     enable_graph=False,
@@ -447,12 +456,14 @@ def main():
         cu_js = cu_js.get_ordered_joint_state(kin_model.joint_names)
         # print(cu_js)
         if args.visualize_spheres and step_index % 2 == 0:
+            # 获取 base link 的世界位置和朝向（四元数）
+            base_pos, base_quat = robot.get_world_pose()
+
             sph_list = kin_model.get_robot_as_spheres(cu_js.position)
 
             if spheres is None:
                 spheres = []
                 # create spheres:
-
                 for si, s in enumerate(sph_list[0]):
                     sp = sphere.VisualSphere(
                         prim_path="/culoco/robot_sphere_" + str(si),
@@ -462,11 +473,16 @@ def main():
                     )
                     spheres.append(sp)
             else:
+                base_rot = R.from_quat([base_quat[1], base_quat[2], base_quat[3], base_quat[0]]) 
                 for si, s in enumerate(sph_list[0]):
                     if not np.isnan(s.position[0]):
-                        print(s.position)
-                        spheres[si].set_world_pose(position=np.ravel(s.position))
+                        local_pos = np.array(s.position[:3])
+                        world_pos = base_rot.apply(local_pos) + base_pos
+                        spheres[si].set_world_pose(position=world_pos)
                         spheres[si].set_radius(float(s.radius))
+                        
+                        # spheres[si].set_world_pose(position=np.ravel(s.position))
+                        # spheres[si].set_radius(float(s.radius))
 
         # robot_static = False
         # if (np.max(np.abs(sim_js.velocities)) < 0.2) or args.reactive:

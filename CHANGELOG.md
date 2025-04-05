@@ -18,6 +18,10 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Yandong Luo: Since the gripper of go2_arx does not support movement in urdf, I have temporarily given up using go2_arx. I am currently using b1_z1. The yml should be configured correctly, and I have added the sphere, which can be displayed in isaacsim. However, due to the lack of KF, the sphere is still embedded in the ground.
 
-## [0.0.4] - 2024-04-02
+## [0.0.5] - 2024-04-02
 ### Changed
 - Yandong Luo: Add foam file for sphere
+
+## [0.0.6] - 2024-04-04
+### Changed
+- Yandong Luo: Fixed the bug that sphere does not follow robot. Checked the logic of FK.

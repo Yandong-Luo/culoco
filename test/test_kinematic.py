@@ -15,7 +15,8 @@
 import torch
 
 # CuRobo
-from culoco.cuda_loco_robot_model.cuda_robot_model import CudaRobotModel
+from culoco.cuda_loco_robot_model.cuda_robot_model import CudaLocoRobotModel
+from curobo.cuda_robot_model.cuda_robot_model import CudaRobotModel
 from curobo.types.base import TensorDeviceType
 from culoco.types.robot import RobotConfig
 from curobo.util.logger import setup_curobo_logger
@@ -55,11 +56,16 @@ def demo_full_config_robot():
     config_file = load_yaml(join_path(get_robot_path(), "b1_z1.yml"))["robot_cfg"]
     robot_cfg = RobotConfig.from_dict(config_file, tensor_args)
 
-    kin_model = CudaRobotModel(robot_cfg.kinematics)
+    # print(robot_cfg.kinematics.)
+    kin_model = None
+    if robot_cfg.kinematics.generator_config.enable_multi_chain == False:
+        kin_model = CudaRobotModel(robot_cfg.kinematics)
+    else:
+        kin_model = CudaLocoRobotModel(robot_cfg.kinematics)
 
     # compute forward kinematics:
-    q = torch.rand((10, kin_model.get_dof()), **(tensor_args.as_torch_dict()))
-    out = kin_model.get_state(q)
+    # q = torch.rand((10, kin_model.get_dof()), **(tensor_args.as_torch_dict()))
+    # out = kin_model.get_state(q)
     # here is the kinematics state:
     # print(out)
 
