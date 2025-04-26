@@ -25,3 +25,7 @@ All notable changes to this project will be documented in this file.
 ## [0.0.6] - 2024-04-04
 ### Changed
 - Yandong Luo: Fixed the bug that sphere does not follow robot. Checked the logic of FK.
+
+## [0.0.7] - 2024-04-26
+### Changed
+- Yandong Luo: Completed the configuration of GO2, and the subsequent projects will focus on the research of loco-motion. Currently supports isaacsim-4.5.0

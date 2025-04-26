@@ -26,14 +26,14 @@ def demo_basic_robot():
     tensor_args = TensorDeviceType()
 
     # load a urdf:
-    config_file = load_yaml(join_path(get_robot_path(), "b1_z1.yml"))
+    config_file = load_yaml(join_path(get_robot_path(), "go2.yml"))
     print("get_robot_path",get_assets_path())
     # asset_root_path = join_path(get_robot_path(), )
     urdf_file = config_file["robot_cfg"]["kinematics"][
         "urdf_path"
     ]  # Send global path starting with "/"
     base_link = config_file["robot_cfg"]["kinematics"]["base_link"]
-    ee_link = config_file["robot_cfg"]["kinematics"]["ee_link"]
+    # ee_link = config_file["robot_cfg"]["kinematics"]["ee_link"]
     leg_ee_links = config_file["robot_cfg"]["kinematics"]["leg_ee_links"]
     ee_links = config_file["robot_cfg"]["kinematics"]["ee_links"]
     robot_cfg = RobotConfig.from_basic(urdf_file, base_link, ee_links, tensor_args)
@@ -53,7 +53,7 @@ def demo_full_config_robot():
     setup_curobo_logger("info")
     tensor_args = TensorDeviceType()
     # load a urdf:
-    config_file = load_yaml(join_path(get_robot_path(), "b1_z1.yml"))["robot_cfg"]
+    config_file = load_yaml(join_path(get_robot_path(), "go2.yml"))["robot_cfg"]
     robot_cfg = RobotConfig.from_dict(config_file, tensor_args)
 
     # print(robot_cfg.kinematics.)

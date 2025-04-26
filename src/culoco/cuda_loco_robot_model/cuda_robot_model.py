@@ -761,48 +761,48 @@ class CudaLocoRobotModel(CudaRobotModel):
 
 #         return m_list
 
-    def get_robot_as_spheres(self, q: torch.Tensor, filter_valid: bool = True) -> List[Sphere]:
-        """Get robot spheres using forward kinematics on given joint configuration q.
+    # def get_robot_as_spheres(self, q: torch.Tensor, filter_valid: bool = True) -> List[Sphere]:
+    #     """Get robot spheres using forward kinematics on given joint configuration q.
 
-        Args:
-            q: Joint configuration of the robot, shape should be [1, dof].
-            filter_valid: Filter out spheres with radius <= 0.
+    #     Args:
+    #         q: Joint configuration of the robot, shape should be [1, dof].
+    #         filter_valid: Filter out spheres with radius <= 0.
 
-        Returns:
-            List[Sphere]: List of all robot spheres.
-        """
-        state = self.get_state(q)
+    #     Returns:
+    #         List[Sphere]: List of all robot spheres.
+    #     """
+    #     state = self.get_state(q)
 
-        # state has sphere position and radius
+    #     # state has sphere position and radius
 
-        sph_all = state.get_link_spheres().cpu().numpy()
+    #     sph_all = state.get_link_spheres().cpu().numpy()
         
-        print(sph_all)
+    #     print(sph_all)
 
-        sph_traj = []
-        for j in range(sph_all.shape[0]):
-            sph = sph_all[j, :, :]
-            if filter_valid:
-                sph_list = [
-                    Sphere(
-                        name="robot_curobo_sphere_" + str(i),
-                        pose=[sph[i, 0], sph[i, 1], sph[i, 2], 1, 0, 0, 0],
-                        radius=sph[i, 3],
-                    )
-                    for i in range(sph.shape[0])
-                    if (sph[i, 3] > 0.0)
-                ]
-            else:
-                sph_list = [
-                    Sphere(
-                        name="robot_curobo_sphere_" + str(i),
-                        pose=[sph[i, 0], sph[i, 1], sph[i, 2], 1, 0, 0, 0],
-                        radius=sph[i, 3],
-                    )
-                    for i in range(sph.shape[0])
-                ]
-            sph_traj.append(sph_list)
-        return sph_traj
+    #     sph_traj = []
+    #     for j in range(sph_all.shape[0]):
+    #         sph = sph_all[j, :, :]
+    #         if filter_valid:
+    #             sph_list = [
+    #                 Sphere(
+    #                     name="robot_curobo_sphere_" + str(i),
+    #                     pose=[sph[i, 0], sph[i, 1], sph[i, 2], 1, 0, 0, 0],
+    #                     radius=sph[i, 3],
+    #                 )
+    #                 for i in range(sph.shape[0])
+    #                 if (sph[i, 3] > 0.0)
+    #             ]
+    #         else:
+    #             sph_list = [
+    #                 Sphere(
+    #                     name="robot_curobo_sphere_" + str(i),
+    #                     pose=[sph[i, 0], sph[i, 1], sph[i, 2], 1, 0, 0, 0],
+    #                     radius=sph[i, 3],
+    #                 )
+    #                 for i in range(sph.shape[0])
+    #             ]
+    #         sph_traj.append(sph_list)
+    #     return sph_traj
 
 #     def get_link_poses(self, q: torch.Tensor, link_names: List[str]) -> Pose:
 #         """Get Pose of links at given joint configuration q using forward kinematics.

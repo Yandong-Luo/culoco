@@ -1,0 +1,282 @@
+robot_cfg:
+  kinematics:
+    use_usd_kinematics: False
+    isaac_usd_path: "config/robots/B1_Z1/urdf/b1/b1.usd"
+    usd_path: "config/robots/B1_Z1/urdf/b1/b1.usd"
+    usd_robot_root: "/B1_Z1"
+    # usd_flip_joints: ["panda_joint1","panda_joint2","panda_joint3","panda_joint4", "panda_joint5",
+    #   "panda_joint6","panda_joint7","panda_finger_joint1", "panda_finger_joint2"]
+    # usd_flip_joints: {
+    # "panda_joint1": "Z",
+    # "panda_joint2": "Z",
+    # "panda_joint3": "Z",
+    # "panda_joint4": "Z",
+    # "panda_joint5": "Z",
+    # "panda_joint6": "Z",
+    # "panda_joint7": "Z",
+    # "panda_finger_joint1": "Y",
+    # "panda_finger_joint2":  "Y",
+    # }
+
+    # usd_flip_joint_limits: ["panda_finger_joint2"]
+    urdf_path: "robot/go2/urdf/go2_description.urdf"
+    asset_root_path: "robot/go2"
+    base_link: "base"
+    # ee_link: "arm_ee_link"
+    # ee_link: ""
+    leg_ee_links: ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
+    ee_links: ["FL_foot", "FR_foot", "RL_foot", "RR_foot"]
+    enable_multi_chain: True
+    collision_link_names: [
+      # "arm_link00", "arm_link01", "arm_link02", "arm_link03", "arm_link04", "arm_link06",
+      # "gripperStator", "gripperMover",
+      "FL_hip", "FL_thigh", "FL_calf", "FL_foot", "FL_calflower", "FL_calflower1",
+      "FR_hip", "FR_thigh", "FR_calf", "FR_foot", "FR_calflower", "FR_calflower1",
+      "RL_hip", "RL_thigh", "RL_calf", "RL_foot", "RL_calflower", "RL_calflower1",
+      "RR_hip", "RR_thigh", "RR_calf", "RR_foot", "RR_calflower", "RR_calflower1",
+      "base"
+    ]
+
+
+    collision_spheres: "spheres/go2_mesh.yml"
+    collision_sphere_buffer: 0.004 # 0.0025
+    extra_collision_spheres: {"attached_object": 4}
+    use_global_cumul: True
+    # self_collision_ignore:
+    #   {
+    #     "panda_link0": ["panda_link1", "panda_link2"],
+    #     "panda_link1": ["panda_link2", "panda_link3", "panda_link4"],
+    #     "panda_link2": ["panda_link3", "panda_link4"],
+    #     "panda_link3": ["panda_link4", "panda_link6"],
+    #     "panda_link4":
+    #       ["panda_link5", "panda_link6", "panda_link7", "panda_link8"],
+    #     "panda_link5": ["panda_link6", "panda_link7", "panda_hand","panda_leftfinger", "panda_rightfinger"],
+    #     "panda_link6": ["panda_link7", "panda_hand", "attached_object", "panda_leftfinger", "panda_rightfinger"],
+    #     "panda_link7": ["panda_hand", "attached_object", "panda_leftfinger", "panda_rightfinger"],
+    #     "panda_hand": ["panda_leftfinger", "panda_rightfinger","attached_object"],
+    #     "panda_leftfinger": ["panda_rightfinger", "attached_object"],
+    #     "panda_rightfinger": ["attached_object"],
+    #   }
+
+    self_collision_ignore:
+      {
+        # ---------- base ----------
+        "base": ["FL_hip", "FR_hip", "RL_hip", "RR_hip"],
+        
+        # ---------- Front Left Leg ----------
+        "FL_hip": ["base", "FL_thigh", "FL_hip_rotor"],
+        "FL_thigh": ["FL_hip", "FL_calf", "FL_thigh_rotor"],
+        "FL_calf": ["FL_thigh", "FL_foot", "FL_calf_rotor", "FL_calflower"],
+        "FL_foot": ["FL_calf", "FL_calflower1"],
+        "FL_calflower": ["FL_calf", "FL_calflower1"],
+        "FL_hip_rotor": ["FL_hip"],
+        "FL_thigh_rotor": ["FL_thigh"],
+        "FL_calf_rotor": ["FL_calf"],
+
+        # ---------- Front Right Leg ----------
+        "FR_hip": ["base", "FR_thigh", "FR_hip_rotor"],
+        "FR_thigh": ["FR_hip", "FR_calf", "FR_thigh_rotor"],
+        "FR_calf": ["FR_thigh", "FR_foot", "FR_calf_rotor", "FR_calflower"],
+        "FR_foot": ["FR_calf", "FR_calflower1"],
+        "FR_calflower": ["FR_calflower1", "FR_calf"],
+        "FR_calflower1": ["FR_calflower"],
+        "FR_hip_rotor": ["FR_hip"],
+        "FR_thigh_rotor": ["FR_thigh"],
+        "FR_calf_rotor": ["FR_calf"],
+
+        # ---------- Rear Left Leg ----------
+        "RL_hip": ["base", "RL_thigh", "RL_hip_rotor"],
+        "RL_thigh": ["RL_hip", "RL_calf", "RL_thigh_rotor"],
+        "RL_calf": ["RL_thigh", "RL_foot", "RL_calf_rotor", "RL_calflower"],
+        "RL_foot": ["RL_calf", "RL_calflower1"],
+        "RL_calflower": ["RL_calflower1", "RL_calf"],
+        "RL_calflower1": ["RL_calflower"],
+        "RL_hip_rotor": ["RL_hip"],
+        "RL_thigh_rotor": ["RL_thigh"],
+        "RL_calf_rotor": ["RL_calf"],
+
+        # ---------- Rear Right Leg ----------
+        "RR_hip": ["base", "RR_thigh", "RR_hip_rotor"],
+        "RR_thigh": ["RR_hip", "RR_calf", "RR_thigh_rotor"],
+        "RR_calf": ["RR_thigh", "RR_foot", "RR_calf_rotor", "RR_calflower"],
+        "RR_foot": ["RR_calf", "RR_calflower1"],
+        "RR_calflower": ["RR_calf", "RR_calflower1"],
+        "RR_calflower1": ["RR_calflower"],
+        "RR_hip_rotor": ["RR_hip"],
+        "RR_thigh_rotor": ["RR_thigh"],
+        "RR_calf_rotor": ["RR_calf"],
+
+        # ---------- Arm ----------
+        # "arm_link00": ["base", "arm_link01"],
+        # "arm_link01": ["arm_link00", "arm_link02"],
+        # "arm_link02": ["arm_link01", "arm_link03"],
+        # "arm_link03": ["arm_link02", "arm_link04"],
+        # "arm_link04": ["arm_link03", "arm_link05"],
+        # "arm_link05": ["arm_link04", "arm_link06"],
+        # "arm_link06": ["arm_link05", "gripperStator"],
+        # "gripperStator": ["arm_link06", "gripperMover"],
+        # "gripperMover": ["gripperStator", "arm_ee_link"],
+
+        # ---------- Optional ----------
+        # "arm_ee_link": ["gripperMover"]
+      }
+
+
+
+    # self_collision_buffer:
+    #   {
+    #     "panda_link0": 0.1,
+    #     "panda_link1": 0.05,
+    #     "panda_link2": 0.0,
+    #     "panda_link3": 0.0,
+    #     "panda_link4": 0.0,
+    #     "panda_link5": 0.0,
+    #     "panda_link6": 0.0,
+    #     "panda_link7": 0.0,
+    #     "panda_hand": 0.02,
+    #     "panda_leftfinger": 0.01,
+    #     "panda_rightfinger": 0.01,
+    #     "attached_object": 0.0,
+    #   }
+
+    self_collision_buffer:
+      {
+        # Base & Head
+        "base": 0.05,
+        "Head_upper": 0.01,
+        "Head_lower": 0.01,
+
+        # FL leg
+        "FL_hip": 0.02,
+        "FL_thigh": 0.015,
+        "FL_calf": 0.015,
+        "FL_calflower": 0.01,
+        "FL_calflower1": 0.01,
+        "FL_foot": 0.01,
+
+        # FR leg
+        "FR_hip": 0.02,
+        "FR_thigh": 0.015,
+        "FR_calf": 0.015,
+        "FR_calflower": 0.01,
+        "FR_calflower1": 0.01,
+        "FR_foot": 0.01,
+
+        # RL leg
+        "RL_hip": 0.02,
+        "RL_thigh": 0.015,
+        "RL_calf": 0.015,
+        "RL_calflower": 0.01,
+        "RL_calflower1": 0.01,
+        "RL_foot": 0.01,
+
+        # RR leg
+        "RR_hip": 0.02,
+        "RR_thigh": 0.015,
+        "RR_calf": 0.015,
+        "RR_calflower": 0.01,
+        "RR_calflower1": 0.01,
+        "RR_foot": 0.01
+
+        # Arm
+        # "arm_link00": 0.02,
+        # "arm_link01": 0.015,
+        # "arm_link02": 0.015,
+        # "arm_link03": 0.015,
+        # "arm_link04": 0.01,
+        # "arm_link05": 0.01,
+        # "arm_link06": 0.01,
+        # "gripperStator": 0.01,
+        # "gripperMover": 0.01,
+
+        # "attached_object": 0.0
+      }
+
+
+    # #link_names: ["panda_link4"]
+    # mesh_link_names:
+    #   [
+    #     "panda_link0",
+    #     "panda_link1",
+    #     "panda_link2",
+    #     "panda_link3",
+    #     "panda_link4",
+    #     "panda_link5",
+    #     "panda_link6",
+    #     "panda_link7",
+    #     "panda_hand",
+    #     "panda_leftfinger",
+    #     "panda_rightfinger",
+    #   ]
+
+    mesh_link_names: [
+      "base",
+      "FR_hip", "FR_thigh", "FR_calf", "FR_calflower", "FR_calflower1",
+      "FL_hip", "FL_thigh", "FL_calf", "FL_calflower", "FL_calflower1",
+      "RR_hip", "RR_thigh", "RR_calf", "RR_calflower", "RR_calflower1",
+      "RL_hip", "RL_thigh", "RL_calf", "RL_calflower", "RL_calflower1"
+      # "arm_link00", "arm_link01", "arm_link02",
+      # "arm_link03", "arm_link04", "arm_link05", "arm_link06",
+      # "gripperStator", "gripperMover"
+    ]
+
+    # lock_joints: {"panda_finger_joint1": 0.04, "panda_finger_joint2": 0.04}
+    # lock_joints: {"jointGripper": 0.0}   # example: 0.0 for close,-1.57 for open, rad
+
+    # extra_links: {"attached_object":{"parent_link_name": "panda_hand" ,
+    # "link_name": "attached_object", "fixed_transform": [0,0,0,1,0,0,0], "joint_type":"FIXED",
+    # "joint_name": "attach_joint" }}
+    # extra_links:
+    #   {
+    #     "attached_object": {
+    #       "parent_link_name": "arm_ee_link",
+    #       "link_name": "attached_object",
+    #       "fixed_transform": [0.0, 0.0, 0.01, 1, 0, 0, 0],
+    #       "joint_type": "FIXED",
+    #       "joint_name": "attach_joint"
+    #     }
+    #   }
+
+
+    cspace:
+      # joint_names: ["panda_joint1","panda_joint2","panda_joint3","panda_joint4", "panda_joint5",
+      # "panda_joint6","panda_joint7","panda_finger_joint1", "panda_finger_joint2"]
+      # joint_names:
+      #   [
+      #     "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint", "FL_calflower_joint", "FL_calflower1_joint",
+      #     "FR_hip_joint", "FR_thigh_joint", "FR_calf_joint", "FR_calflower_joint", "FR_calflower1_joint",
+      #     "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint", "RL_calflower_joint", "RL_calflower1_joint",
+      #     "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint", "RR_calflower_joint", "RR_calflower1_joint",
+      #     # "arm_joint1", "arm_joint2", "arm_joint3",
+      #     # "arm_joint4", "arm_joint5", "arm_joint6"
+      #   ]
+
+      joint_names: [
+        "FL_hip_joint", "FL_thigh_joint", "FL_calf_joint",
+        "FR_hip_joint", "FR_thigh_joint", "FR_calf_joint",
+        "RL_hip_joint", "RL_thigh_joint", "RL_calf_joint",
+        "RR_hip_joint", "RR_thigh_joint", "RR_calf_joint"
+        # "arm_joint1", "arm_joint2", "arm_joint3",
+        # "arm_joint4", "arm_joint5", "arm_joint6",
+        # "jointGripper"
+      ]
+
+      # stand up
+      retract_config: [0.00571868, 0.608813, -1.21763,
+                       -0.00571868, 0.608813, -1.21763,
+                       0.00571868, 0.608813, -1.21763,
+                       -0.00571868, 0.608813, -1.21763]
+                      #  0.0, 0.0, 0.0,
+                      #  0.0, 0.0, 0.0,
+                      #  0.0]
+      # # stand down
+      # retract_config: [0.0473455, 1.22187, -2.44375,
+      #                  -0.0473455, 1.22187, -2.44375,
+      #                  0.0473455, 1.22187, -2.44375,
+      #                  -0.0473455, 1.22187, -2.44375,
+      #                  0.0, 0.0, 0.0,
+      #                  0.0, 0.0, 0.0]
+      null_space_weight: [1,1,1,1,1,1,1,1,1,1,1,1]
+      cspace_distance_weight: [1,1,1,1,1,1,1,1,1,1,1,1]
+      max_acceleration: 15.0
+      max_jerk: 500.0
