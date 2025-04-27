@@ -19,8 +19,8 @@ from typing import Any, Optional
 from culoco.cuda_loco_robot_model.cuda_robot_generator import CudaRobotGeneratorConfig
 from culoco.cuda_loco_robot_model.cuda_robot_model import CudaRobotModelConfig
 
-from culoco.cuda_loco_robot_model.cuda_loco_generator import CudaLocoGeneratorConfig
-from culoco.cuda_loco_robot_model.cuda_loco_model import CudaLocoModelConfig
+# from culoco.cuda_loco_robot_model.cuda_loco_generator import CudaLocoGeneratorConfig
+# from culoco.cuda_loco_robot_model.cuda_loco_model import CudaLocoModelConfig
 from curobo.cuda_robot_model.types import CSpaceConfig
 from curobo.types.base import TensorDeviceType
 # from curobo.types.state import JointState, State  # For compatibility with older versions.

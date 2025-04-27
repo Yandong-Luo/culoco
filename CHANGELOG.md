@@ -29,3 +29,7 @@ All notable changes to this project will be documented in this file.
 ## [0.0.7] - 2024-04-26
 ### Changed
 - Yandong Luo: Completed the configuration of GO2, and the subsequent projects will focus on the research of loco-motion. Currently supports isaacsim-4.5.0
+
+## [0.0.8] - 2024-04-28
+### Changed
+- Yandong Luo: Comparing with Pinocchio's result, the correctness of go2 forward kinematic is verified.

@@ -177,19 +177,6 @@ robot_cfg:
         "RR_calflower": 0.01,
         "RR_calflower1": 0.01,
         "RR_foot": 0.01
-
-        # Arm
-        # "arm_link00": 0.02,
-        # "arm_link01": 0.015,
-        # "arm_link02": 0.015,
-        # "arm_link03": 0.015,
-        # "arm_link04": 0.01,
-        # "arm_link05": 0.01,
-        # "arm_link06": 0.01,
-        # "gripperStator": 0.01,
-        # "gripperMover": 0.01,
-
-        # "attached_object": 0.0
       }
 
 
